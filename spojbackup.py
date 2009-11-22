@@ -3,11 +3,11 @@
 
 '''
 
-                 _____ _____ _____    __    _           _
-                |   __|  _  |     |__|  |  | |_ ___ ___| |_ _ _ ___
-                |__   |   __|  |  |  |  |  | . | .'|  _| '_| | | . |
-                |_____|__|  |_____|_____|  |___|__,|___|_,_|___|  _|
-                                                            |_|
+             _____ _____ _____    __    _           _
+            |   __|  _  |     |__|  |  | |_ ___ ___| |_ _ _ ___
+            |__   |   __|  |  |  |  |  | . | .'|  _| '_| | | . |
+            |_____|__|  |_____|_____|  |___|__,|___|_,_|___|  _|
+                                                        |_|
                                     by Abhishek Mishra <ideamonk >< gmail.com >
 
 
@@ -64,6 +64,21 @@ def getSolutions (path_prefix):
     username = raw_input()
     password = getpass.getpass()
 
+    # Authenticate the user
+    print "Authenticating " + username
+    br.open ("http://spoj.pl")
+    br.select_form (name="login")
+    br["login_user"] = username
+    br["password"] = password
+    # sign em up for a day for avoiding timeouts
+    br.find_control(name="autologin").items[0].selected = True
+    response = br.submit()
+
+    verify = response.read()
+    if (verify.find("Authentication failed!") != -1):
+        print "Error authenticating - " + username
+        exit(0)
+
     # grab the signed list of submissions
     print "Grabbing siglist for " + username
     siglist = br.open("https://www.spoj.pl/status/" + username + "/signedlist")
@@ -83,7 +98,7 @@ def getSolutions (path_prefix):
             # reached end of siglist
             break
 
-        if (len(temp)):
+        if (len(temp)==0):
             print "Reached EOF, siglist format has probably changed," + \
                     " contact author."
             exit(1)
@@ -95,44 +110,30 @@ def getSolutions (path_prefix):
 
     totalsubmissions = len(mysublist)
 
-    # Authenticate the user
-    print "Authenticating " + username
-    br.open ("http://spoj.pl")
-    br.select_form(name="login")
-    br["login_user"] = username
-    br["password"] = password
-    response = br.submit()
-
-    verify = response.read()
-    if (verify.find("Authentication failed!")!=-1):
-        print "Error authenticating - " + username
-        exit(0)
-
     print "Fetching sources into " + path_prefix
-    i=0
+    progress = 0
     for entry in mysublist:
+        source_code = br.open("https://www.spoj.pl/files/src/save/" + \
+                                                                    entry[1])
+        header = dict(source_code.info())
+        filename = ""
         try:
-            source_code = br.open("https://www.spoj.pl/files/src/save/" + \
-                                                                       entry[1])
-            header = dict(source_code.info())
-            filename = ""
-            try:
-                filename = header['content-disposition'].split('=')[1]
-                filename = entry[3] + "-" + filename
-            except:
-                filename = entry[3] + "-" + entry[1]
+            filename = header['content-disposition'].split('=')[1]
+            filename = entry[3] + "-" + filename
+        except:
+            filename = entry[3] + "-" + entry[1]
 
-            fp = open( os.path.join(path_prefix,filename), "w")
+        progress += 1
+        if (os.path.exists(os.path.join(path_prefix, filename))):
+            print "%d/%d - %s skipped." % (progress, totalsubmissions, filename)
+        else:
+            fp = open( os.path.join(path_prefix, filename), "w")
             fp.write (source_code.read())
             fp.close
-            i+=1
-            print "%d/%d - %s done." % (i,totalsubmissions,filename)
-        except:
-            i+=1
-            print "%d/%d - %s ERROR." % (i,totalsubmissions,entry[3])
+            print "%d/%d - %s done." % (progress, totalsubmissions, filename)
 
     print "Created a backup of %d submission for %s" % \
-                                                    (totalsubmissions,username)
+                                                    (totalsubmissions, username)
 
 
 if __name__=="__main__":
@@ -140,7 +141,7 @@ if __name__=="__main__":
             description = "Creates a backup of all your Submissions on SPOJ " +\
             "(Sphere Online Judge) http://spoj.pl in a desired place")
 
-    parser.add_argument("-o","--outputpath",default="./", type=str,
+    parser.add_argument("-o", "--outputpath",default="./", type=str,
                               help="Directory to store all fetched solutions")
 
     args = parser.parse_args()

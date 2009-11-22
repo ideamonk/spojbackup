@@ -50,7 +50,7 @@ except ImportError:
     print "mechanize is required but missing"
     sys.exit(1)
     
-import getpass, os
+import getpass, os, glob
 
 
 def getSolutions (path_prefix):
@@ -112,21 +112,25 @@ def getSolutions (path_prefix):
 
     print "Fetching sources into " + path_prefix
     progress = 0
+    
     for entry in mysublist:
-        source_code = br.open("https://www.spoj.pl/files/src/save/" + \
-                                                                    entry[1])
-        header = dict(source_code.info())
-        filename = ""
-        try:
-            filename = header['content-disposition'].split('=')[1]
-            filename = entry[3] + "-" + filename
-        except:
-            filename = entry[3] + "-" + entry[1]
+        existing_files = glob.glob(os.path.join(path_prefix, "%s-%s*" % \
+                                                           (entry[3],entry[1])))
 
         progress += 1
-        if (os.path.exists(os.path.join(path_prefix, filename))):
-            print "%d/%d - %s skipped." % (progress, totalsubmissions, filename)
+        if (len(existing_files)>0):
+            print "%d/%d - %s skipped." % (progress, totalsubmissions, entry[3])
         else:
+            source_code = br.open("https://www.spoj.pl/files/src/save/" + \
+                                                                       entry[1])
+            header = dict(source_code.info())
+            filename = ""
+            try:
+                filename = header['content-disposition'].split('=')[1]
+                filename = entry[3] + "-" + filename
+            except:
+                filename = entry[3] + "-" + entry[1]
+                
             fp = open( os.path.join(path_prefix, filename), "w")
             fp.write (source_code.read())
             fp.close

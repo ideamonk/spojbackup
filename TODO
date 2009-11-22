@@ -1,0 +1,14 @@
+1. [ ] argparse for http configs / optional for normal users
+2. [ ] no mercy on zero byte files
+3. [+] https http issues
+4. [ ] packaging, such that
+           after installing,
+           one is able to say
+           $ mkdir foobarcodes
+           $ cd foobarcodes
+           $ spojbackup
+            Enter username:
+            password
+            .
+            .
+            .

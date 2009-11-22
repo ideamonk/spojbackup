@@ -50,30 +50,21 @@ except ImportError:
     print "mechanize is required but missing"
     sys.exit(1)
     
-import getpass
+import getpass, os
 
-if __name__=="__main__":
-    parser = argparse.ArgumentParser(prog="spojbackup",
-            description = "Creates a backup of all your Submissions on SPOJ " +\
-            "(Sphere Online Judge) http://spoj.pl in a desired place")
 
-    parser.add_argument("outputpath",
-                              help="Directory to store all fetched solutions")
-
-    args = parser.parse_args()
-    
+def getSolutions (path_prefix):
     br = Browser()
+    
     # make me a browser that makes ass of robots.txt
     br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
-    # and yes, make sure those evil robots don't squash you
     br.set_handle_robots(False)
 
     print "Enter yout SPOJ username :",
     username = raw_input()
     password = getpass.getpass()
-    path_prefix = "./ideamonk"
-    
-    # grab the signed list
+
+    # grab the signed list of submissions
     print "Grabbing siglist for " + username
     siglist = br.open("https://www.spoj.pl/status/" + username + "/signedlist")
 
@@ -82,23 +73,30 @@ if __name__=="__main__":
         crap = siglist.readline()
 
     # make a list of all AC's and challenges
-    print "Filtering list..."
+    print "Filtering siglist for AC/Challenge solutions..."
     mysublist = list()
 
     while (1):
         temp = siglist.readline()
+        
         if temp=='\------------------------------------------------------------------------------/\n':
+            # reached end of siglist
             break
 
-        # | 1009519 | 2007-09-28 11:53:13 |     FCTRL |        WA |  0.00 |   1616 |   C |
+        if (len(temp)):
+            print "Reached EOF, siglist format has probably changed," + \
+                    " contact author."
+            exit(1)
+            
         entry = [x.strip() for x in temp.split('|')]
+        
         if (entry[4] == 'AC' or entry[4].isdigit()):
             mysublist.append (entry)
 
     totalsubmissions = len(mysublist)
 
     # Authenticate the user
-    print "Authenticating user..."
+    print "Authenticating " + username
     br.open ("http://spoj.pl")
     br.select_form(name="login")
     br["login_user"] = username
@@ -107,32 +105,45 @@ if __name__=="__main__":
 
     verify = response.read()
     if (verify.find("Authentication failed!")!=-1):
-        print verify
         print "Error authenticating - " + username
         exit(0)
 
     print "Fetching sources into " + path_prefix
     i=0
-    skip = 110
     for entry in mysublist:
-        if (i<skip):
-            i+=1
-        else:
+        try:
+            source_code = br.open("https://www.spoj.pl/files/src/save/" + \
+                                                                       entry[1])
+            header = dict(source_code.info())
+            filename = ""
             try:
-                source_code = br.open("https://www.spoj.pl/files/src/save/" + entry[1])
-                header = dict(source_code.info())
-                filename = ""
-                try:
-                    filename = header['content-disposition'].split('=')[1]
-                    filename = entry[3] + "-" + filename
-                except:
-                    filename = entry[3] + "-" + entry[1]
-
-                fp = open(path_prefix + "/" + filename, "w")
-                fp.write (source_code.read())
-                fp.close
-                i+=1
-                print "%d/%d - %s done." % (i,totalsubmissions,filename)
+                filename = header['content-disposition'].split('=')[1]
+                filename = entry[3] + "-" + filename
             except:
-                i+=1
-                print "%d/%d - %s ERROR." % (i,totalsubmissions,entry[3])
+                filename = entry[3] + "-" + entry[1]
+
+            fp = open( os.path.join(path_prefix,filename), "w")
+            fp.write (source_code.read())
+            fp.close
+            i+=1
+            print "%d/%d - %s done." % (i,totalsubmissions,filename)
+        except:
+            i+=1
+            print "%d/%d - %s ERROR." % (i,totalsubmissions,entry[3])
+
+    print "Created a backup of %d submission for %s" % \
+                                                    (totalsubmissions,username)
+
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(prog="spojbackup",
+            description = "Creates a backup of all your Submissions on SPOJ " +\
+            "(Sphere Online Judge) http://spoj.pl in a desired place")
+
+    parser.add_argument("-o","--outputpath",default="./", type=str,
+                              help="Directory to store all fetched solutions")
+
+    args = parser.parse_args()
+
+    getSolutions (args.outputpath)
+    

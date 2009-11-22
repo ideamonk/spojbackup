@@ -38,6 +38,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 
+import getpass, os, glob
+
 try:
     import argparse
 except ImportError:
@@ -50,8 +52,6 @@ except ImportError:
     print "mechanize is required but missing"
     sys.exit(1)
     
-import getpass, os, glob
-
 
 def getSolutions (path_prefix):
     br = Browser()

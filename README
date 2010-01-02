@@ -1,4 +1,4 @@
-
+'''
              _____ _____ _____    __    _           _
             |   __|  _  |     |__|  |  | |_ ___ ___| |_ _ _ ___
             |__   |   __|  |  |  |  |  | . | .'|  _| '_| | | . |
@@ -33,6 +33,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------/
+'''
 
 
 SPOJBACKUP is a Python script that helps you take incremental backup of all your

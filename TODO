@@ -1,7 +1,8 @@
 1. [ ] argparse for proxy configs / optional for normal users
 2. [+] no mercy on zero byte files
 3. [+] https http issues
-4. [ ] packaging, such that
+4. [ ] modify file modification dates to match spoj submission timestamp
+5. [ ] packaging, such that
            after installing,
            one is able to say
            $ mkdir foobarcodes

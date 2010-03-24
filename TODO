@@ -1,4 +1,4 @@
-1. [ ] argparse for proxy configs / optional for normal users
+1. [+] optparse for proxy configs / optional for normal users
 2. [+] no mercy on zero byte files
 3. [+] https http issues
 4. [ ] modify file modification dates to match spoj submission timestamp

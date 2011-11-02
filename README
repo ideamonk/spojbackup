@@ -4,10 +4,7 @@
             |__   |   __|  |  |  |  |  | . | .'|  _| '_| | | . |
             |_____|__|  |_____|_____|  |___|__,|___|_,_|___|  _|
                                                            |_|
-                                       by Abhishek Mishra <ideamonk gmail.com >
-								      Shashwat Anand <anand.shashwat gmail.com>
-
-
+                                       
 Copyright (c) 2009, Abhishek Mishra
 All rights reserved.
 
@@ -54,3 +51,5 @@ Notes -
 	* Maybe we can add a tiny UI too, if at all needed
 
 
+Author - Abhishek Mishra <ideamonk gmail.com >
+Proxy support - Shashwat Anand <anand.shashwat gmail.com>

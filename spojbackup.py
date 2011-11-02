@@ -8,13 +8,8 @@
             |__   |   __|  |  |  |  |  | . | .'|  _| '_| | | . |
             |_____|__|  |_____|_____|  |___|__,|___|_,_|___|  _|
                                                            |_|
-                                    by Abhishek Mishra      <ideamonk@gmail.com >
-                                       Shashwat Anand  <anand.shashwat@gmail.com> 
 
 Keywords: python, tools, algorithms, spoj
-
-Copyright (C) 2003-2004 Free Software Foundation, Inc.
-
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -106,9 +101,9 @@ def getSolutions (path_prefix, path_proxy):
     print "Filtering siglist for AC/Challenge solutions..."
     mysublist = list()
 
-    while True: 
+    while True:
         temp = siglist.readline()
-        
+
         if temp=='\------------------------------------------------------------------------------/\n':
             # reached end of siglist
             break
@@ -117,9 +112,9 @@ def getSolutions (path_prefix, path_proxy):
             print "Reached EOF, siglist format has probably changed," + \
                     " contact author."
             exit(1)
-            
+
         entry = [x.strip() for x in temp.split('|')]
-        
+
         if entry[4] == 'AC' or entry[4].isdigit():
             mysublist.append (entry)
 
@@ -127,7 +122,6 @@ def getSolutions (path_prefix, path_proxy):
     return mysublist
 
 def downloadSolutions(mysublist):
-    
     totalsubmissions = len(mysublist)
     
     print "Fetching sources into " + path_prefix

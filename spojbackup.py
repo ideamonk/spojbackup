@@ -74,14 +74,23 @@ def getSolutions (path_prefix, path_proxy):
 
     # authenticate the user
     print "Authenticating " + username
-    br.open ("http://spoj.pl")
-    br.select_form (name="login")
+    br.open ("http://spoj.com/login")
+    #br.select_form (name="login")
+    #the form no longer is named "login" therefore to access it by id:
+    formcount=0
+    for frm in br.forms():  
+    	if str(frm.attrs["id"])=="login-form":
+    		break
+  	formcount=formcount+1
+    br.select_form(nr=formcount)
+    
     br["login_user"] = username
     br["password"] = password
 
     # sign in for a day to avoid timeouts
-    br.find_control(name="autologin").items[0].selected = True
-    br.form.action = "http://www.spoj.pl"
+    #br.find_control(name="autologin").items[0].selected = True
+    #this attribute is missing in the new spoj format
+    br.form.action = "http://www.spoj.com/login"
     response = br.submit()
 
     verify = response.read()

@@ -43,7 +43,8 @@ import sys
 import glob
 import getpass
 import optparse
-
+import time
+import datetime
 
 try:
     from mechanize import Browser
@@ -157,6 +158,8 @@ def downloadSolutions(mysublist):
             fp = open( os.path.join(path_prefix, filename), "w")
             fp.write (source_code.read())
             fp.close
+            timestamp = time.mktime(datetime.datetime.strptime(entry[2], "%Y-%m-%d %H:%M:%S").timetuple())
+            os.utime(os.path.join(path_prefix, filename),(timestamp, timestamp))
             print "%d/%d - %s done." % (progress, totalsubmissions, filename)
 
     print "Created a backup of %d submission for %s" % \
